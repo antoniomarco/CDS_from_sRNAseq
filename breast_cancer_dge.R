@@ -6,6 +6,8 @@ library(tidyverse)
 library(edgeR)
 library(DESeq2)
 library(EnhancedVolcano)
+# Set seed
+set.seed(1221)
 
 # Authors: Aygun Azadova and Antonio Marco
 
@@ -164,91 +166,7 @@ write.table(resmR, file = "plots/DGE_mRNA_BC.tab")
 # save(targets_SV, file = "datasets/targets_SV.Rdata")
 load("datasets/targets_SV.Rdata")
 
-
-## Analysis of targets (MTB and SV)
-
-# log2FC SV of interacting pairs
-SV_pairs_l2FC <- as_tibble(hits_over_microRNA, rownames = "miR") |> 
-  right_join(targets_SV, by = "miR") |> 
-  select (miR, log2FoldChange, tr) |>
-  left_join(as_tibble(hits_over_mRNA, rownames = "tr"), by = "tr") |>
-  select(miR, log2FoldChange.x, tr, log2FoldChange.y) |> 
-  filter((!is.na(log2FoldChange.x)) & (!is.na(log2FoldChange.y)))
-# Plot
-SV_nn <- SV_pairs_l2FC |> unique() |> filter((log2FoldChange.x < 0) & (log2FoldChange.y < 0)) |> nrow()
-SV_pn <- SV_pairs_l2FC |> unique() |> filter((log2FoldChange.x > 0) & (log2FoldChange.y < 0)) |> nrow()
-SV_np <- SV_pairs_l2FC |> unique() |> filter((log2FoldChange.x < 0) & (log2FoldChange.y > 0)) |> nrow()
-SV_pp <- SV_pairs_l2FC |> unique() |> filter((log2FoldChange.x > 0) & (log2FoldChange.y > 0)) |> nrow()
-
-# # 1 2 or 3 or more targets code only for information
-# # Uncomment if wanted
-# # log2FC SV=1 (exactly one) of interacting pairs
-# SV_pairs_l2FC_unique <- SV_pairs_l2FC |>
-#   distinct()
-# SV_pairs_l2FC_unique <- SV_pairs_l2FC_unique |>
-#   mutate(count = SV_pairs_l2FC |>
-#            count(miR, tr) |>
-#            pull(n))
-# targets_SV_unique <- targets_SV |>
-#   select(miR,tr) |>
-#   distinct()
-# targets_SV1 <- as_tibble(targets_SV_unique) |>
-#   mutate(count = targets_SV |>
-#            count(miR, tr) |>
-#            pull(n)) |>
-#   filter(count == 1) |>
-#   select(miR, tr)
-# SV1_pairs_l2FC <- as_tibble(hits_over_microRNA, rownames = "miR") |> 
-#   right_join(targets_SV1, by = "miR") |> 
-#   select (miR, log2FoldChange, tr) |>
-#   left_join(as_tibble(hits_over_mRNA, rownames = "tr"), by = "tr") |>
-#   select(miR, log2FoldChange.x, tr, log2FoldChange.y) |> 
-#   filter((!is.na(log2FoldChange.x)) & (!is.na(log2FoldChange.y)))
-# # Plot
-# SV1_pairs_l2FC |> unique() |> filter((log2FoldChange.x) < 0 & (log2FoldChange.y < 0)) |> nrow()
-# SV1_pairs_l2FC |> unique() |> filter((log2FoldChange.x) > 0 & (log2FoldChange.y < 0)) |> nrow()
-# SV1_pairs_l2FC |> unique() |> filter((log2FoldChange.x) < 0 & (log2FoldChange.y > 0)) |> nrow()
-# SV1_pairs_l2FC |> unique() |> filter((log2FoldChange.x) > 0 & (log2FoldChange.y > 0)) |> nrow()
-# 
-# # log2FC SV=2 (two) of interacting pairs
-# targets_SV2 <- as_tibble(targets_SV_unique) |>
-#   mutate(count = targets_SV |>
-#            count(miR, tr) |>
-#            pull(n)) |>
-#   filter(count == 2) |>
-#   select(miR, tr)
-# SV2_pairs_l2FC <- as_tibble(hits_over_microRNA, rownames = "miR") |> 
-#   right_join(targets_SV2, by = "miR") |> 
-#   select (miR, log2FoldChange, tr) |>
-#   left_join(as_tibble(hits_over_mRNA, rownames = "tr"), by = "tr") |>
-#   select(miR, log2FoldChange.x, tr, log2FoldChange.y) |> 
-#   filter((!is.na(log2FoldChange.x)) & (!is.na(log2FoldChange.y)))
-# # Plot
-# SV2_pairs_l2FC |> unique() |> filter((log2FoldChange.x) < 0 & (log2FoldChange.y < 0)) |> nrow()
-# SV2_pairs_l2FC |> unique() |> filter((log2FoldChange.x) > 0 & (log2FoldChange.y < 0)) |> nrow()
-# SV2_pairs_l2FC |> unique() |> filter((log2FoldChange.x) < 0 & (log2FoldChange.y > 0)) |> nrow()
-# SV2_pairs_l2FC |> unique() |> filter((log2FoldChange.x) > 0 & (log2FoldChange.y > 0)) |> nrow()
-# 
-# # log2FC SV>2 (more than two) of interacting pairs
-# targets_SV3 <- as_tibble(targets_SV_unique) |>
-#   mutate(count = targets_SV |>
-#            count(miR, tr) |>
-#            pull(n)) |>
-#   filter(count > 2) |>
-#   select(miR, tr)
-# SV3_pairs_l2FC <- as_tibble(hits_over_microRNA, rownames = "miR") |> 
-#   right_join(targets_SV3, by = "miR") |> 
-#   select (miR, log2FoldChange, tr) |>
-#   left_join(as_tibble(hits_over_mRNA, rownames = "tr"), by = "tr") |>
-#   select(miR, log2FoldChange.x, tr, log2FoldChange.y) |> 
-#   filter((!is.na(log2FoldChange.x)) & (!is.na(log2FoldChange.y)))
-# # Plot
-# SV3_pairs_l2FC |> unique() |> filter((log2FoldChange.x) < 0 & (log2FoldChange.y < 0)) |> nrow()
-# SV3_pairs_l2FC |> unique() |> filter((log2FoldChange.x) > 0 & (log2FoldChange.y < 0)) |> nrow()
-# SV3_pairs_l2FC |> unique() |> filter((log2FoldChange.x) < 0 & (log2FoldChange.y > 0)) |> nrow()
-# SV3_pairs_l2FC |> unique() |> filter((log2FoldChange.x) > 0 & (log2FoldChange.y > 0)) |> nrow()
-
-# MTB
+# Load MTB data
 targets_MTB <- read.table("datasets/mirtarbase_hsa_9.tab.gz")
 colnames(targets_MTB) <- c("miR", "tr")
 # log2FC MTB of interacting pairs
@@ -259,105 +177,226 @@ MTB_pairs_l2FC <- as_tibble(hits_over_microRNA, rownames = "miR") |>
   select(miR, log2FoldChange.x, tr, log2FoldChange.y) |> 
   filter((!is.na(log2FoldChange.x)) & (!is.na(log2FoldChange.y))) |>
   unique()
-# Plot
-MTB_nn <- MTB_pairs_l2FC |> filter((log2FoldChange.x < 0) & (log2FoldChange.y < 0)) |> nrow()
-MTB_pn <- MTB_pairs_l2FC |> filter((log2FoldChange.x > 0) & (log2FoldChange.y < 0)) |> nrow()
-MTB_np <- MTB_pairs_l2FC |> filter((log2FoldChange.x < 0) & (log2FoldChange.y > 0)) |> nrow()
-MTB_pp <- MTB_pairs_l2FC |> filter((log2FoldChange.x > 0) & (log2FoldChange.y > 0)) |> nrow()
 
 
-# Plots
-MTB <- c(MTB_nn,MTB_pn,MTB_np,MTB_pp)
-MTB_plot <- ggplot() + 
-  geom_bar(aes(x=seq_along(MTB),y=MTB), stat='identity') +
-  xlab('') +
-  ylab('Number of miR/mR interactions') +
-  annotate("text", x=1, y=(MTB_nn/2)+10, label= paste("\U2193", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=1, y=(MTB_nn/2)-10, label= paste("\U2193", "gene", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=2, y=(MTB_pn/2)+10, label= paste("\U2191", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=2, y=(MTB_pn/2)-10, label= paste("\U2193", "gene", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=3, y=(MTB_np/2)+10, label= paste("\U2191", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=3, y=(MTB_np/2)-10, label= paste("\U2191", "gene", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=4, y=(MTB_pp/2)+10, label= paste("\U2193", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=4, y=(MTB_pp/2)-10, label= paste("\U2191", "gene", sep = " "), size = 3.4, color = "white") +
-  theme_bw()
-SV <- c(SV_nn,SV_pn,SV_np,SV_pp)
-SV_plot <- ggplot() + 
-  geom_bar(aes(x=seq_along(SV),y=SV), stat='identity') +
-  xlab('') +
-  ylab('Number of miR/mR interactions') +
-  annotate("text", x=1, y=(SV_nn/2)+100, label= paste("\U2193", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=1, y=(SV_nn/2)-100, label= paste("\U2193", "gene", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=2, y=(SV_pn/2)+100, label= paste("\U2191", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=2, y=(SV_pn/2)-100, label= paste("\U2193", "gene", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=3, y=(SV_np/2)+100, label= paste("\U2191", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=3, y=(SV_np/2)-100, label= paste("\U2191", "gene", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=4, y=(SV_pp/2)+100, label= paste("\U2193", "miR", sep = " "), size = 3.4, color = "white") +
-  annotate("text", x=4, y=(SV_pp/2)-100, label= paste("\U2191", "gene", sep = " "), size = 3.4, color = "white") +
-  theme_bw()
-ggsave(MTB_plot + SV_plot + plot_annotation(tag_levels = "A"), file = "plots/figure_bars_targets.png", height = 3, width = 6)
-# Shape asexpected!!
+## Analysis of targets (MTB and SV)
+
+# log2FC SV of interacting pairs
+SV_pairs_l2FC <- as_tibble(hits_over_microRNA, rownames = "miR") |> 
+  right_join(targets_SV, by = "miR") |> 
+  select (miR, log2FoldChange, tr) |>
+  left_join(as_tibble(hits_over_mRNA, rownames = "tr"), by = "tr") |>
+  select(miR, log2FoldChange.x, tr, log2FoldChange.y) |> 
+  filter((!is.na(log2FoldChange.x)) & (!is.na(log2FoldChange.y)))
+
+# Prefilter in dataset: Not in target
+targets_SV_f <- targets_SV[which((targets_SV$miR %in% row.names(hits_over_microRNA)) & (targets_SV$tr %in% row.names(hits_over_mRNA))),]
+targets_SV_list <- paste0(targets_SV_f$miR, targets_SV_f$tr)
+SV_pairs_l2FC_NT <- data.frame(miR = character(0),
+                               log2FoldChange.x = numeric(0),
+                               tr = character(0),
+                               log2FoldChange.y = numeric(0))
+for(miR in 1:nrow(hits_over_microRNA)){
+  for(tr in 1:nrow(hits_over_mRNA)){
+    if(paste0(rownames(hits_over_microRNA[miR,]), rownames(hits_over_mRNA[tr,])) %in% targets_SV_list){
+    }else{
+      SV_pairs_l2FC_NT <- rbind(SV_pairs_l2FC_NT, data.frame(miR = rownames(hits_over_microRNA[miR,]),
+                                                             log2FoldChange.x = hits_over_microRNA[miR,'log2FoldChange'],
+                                                             tr = rownames(hits_over_mRNA[tr,]),
+                                                             log2FoldChange.y = hits_over_mRNA[tr,'log2FoldChange']))
+    }
+  }
+}
+SV_pairs_l2FC_NT <- as_tibble(SV_pairs_l2FC_NT)
+
+# For contingency table
+in_MTB_pn <- MTB_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x > 0) & (log2FoldChange.y < 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+in_SV_pn <- SV_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x > 0) & (log2FoldChange.y < 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+not_in_SV_pn <- SV_pairs_l2FC_NT |> 
+  unique() |> 
+  filter((log2FoldChange.x > 0) & (log2FoldChange.y < 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+in_MTB_nn <- MTB_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x < 0) & (log2FoldChange.y < 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+in_SV_nn <- SV_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x < 0) & (log2FoldChange.y < 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+not_in_SV_nn <- SV_pairs_l2FC_NT |> 
+  unique() |> 
+  filter((log2FoldChange.x < 0) & (log2FoldChange.y < 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+in_MTB_pp <- MTB_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x > 0) & (log2FoldChange.y > 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+in_SV_pp <- SV_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x > 0) & (log2FoldChange.y > 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+not_in_SV_pp <- SV_pairs_l2FC_NT |> 
+  unique() |> 
+  filter((log2FoldChange.x > 0) & (log2FoldChange.y > 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+in_MTB_np <- MTB_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x < 0) & (log2FoldChange.y > 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+in_SV_np <- SV_pairs_l2FC |> 
+  unique() |> 
+  filter((log2FoldChange.x < 0) & (log2FoldChange.y > 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+not_in_SV_np <- SV_pairs_l2FC_NT |> 
+  unique() |> 
+  filter((log2FoldChange.x < 0) & (log2FoldChange.y > 0)) |>
+  mutate(tar = paste0(tr, miR)) |>
+  select(tar)
+
+# Contingecy table
+in_SV_pn_in_TB <- in_SV_pn[in_SV_pn$tar %in% in_MTB_pn$tar,]
+in_SV_pn_not_in_TB <- in_SV_pn[!(in_SV_pn$tar %in% in_MTB_pn$tar),]
+not_in_SV_pn_in_TB <- not_in_SV_pn[not_in_SV_pn$tar %in% in_MTB_pn$tar,]
+not_in_SV_pn_not_in_TB <- not_in_SV_pn[!(not_in_SV_pn$tar %in% in_MTB_pn$tar),]
+in_SV_nn_in_TB <- in_SV_nn[in_SV_nn$tar %in% in_MTB_nn$tar,]
+in_SV_nn_not_in_TB <- in_SV_nn[!(in_SV_nn$tar %in% in_MTB_nn$tar),]
+not_in_SV_nn_in_TB <- not_in_SV_nn[not_in_SV_nn$tar %in% in_MTB_nn$tar,]
+not_in_SV_nn_not_in_TB <- not_in_SV_nn[!(not_in_SV_nn$tar %in% in_MTB_nn$tar),]
+in_SV_pp_in_TB <- in_SV_pp[in_SV_pp$tar %in% in_MTB_pp$tar,]
+in_SV_pp_not_in_TB <- in_SV_pp[!(in_SV_pp$tar %in% in_MTB_pp$tar),]
+not_in_SV_pp_in_TB <- not_in_SV_pp[not_in_SV_pp$tar %in% in_MTB_pp$tar,]
+not_in_SV_pp_not_in_TB <- not_in_SV_pp[!(not_in_SV_pp$tar %in% in_MTB_pp$tar),]
+in_SV_np_in_TB <- in_SV_np[in_SV_np$tar %in% in_MTB_np$tar,]
+in_SV_np_not_in_TB <- in_SV_np[!(in_SV_np$tar %in% in_MTB_np$tar),]
+not_in_SV_np_in_TB <- not_in_SV_np[not_in_SV_np$tar %in% in_MTB_np$tar,]
+not_in_SV_np_not_in_TB <- not_in_SV_np[!(not_in_SV_np$tar %in% in_MTB_np$tar),]
+
+
+# Enrichment in targets (predicted) for log fold configurations against MTB
+LOR_pn_nn <- log((nrow(in_SV_pn_in_TB)*nrow(in_SV_nn_not_in_TB))/(nrow(in_SV_pn_not_in_TB)*nrow(in_SV_nn_in_TB)))
+SEM_pn_nn <- sqrt(nrow(in_SV_pn_in_TB)^(-1) + nrow(in_SV_nn_not_in_TB)^(-1) + nrow(in_SV_pn_not_in_TB)^(-1) + nrow(in_SV_nn_in_TB)^(-1))
+ZSC_pn_nn <- LOR_pn_nn / SEM_pn_nn
+PVL_pn_nn <- pnorm(ZSC_pn_nn, mean = 0, sd = 1, lower.tail = FALSE) # One-tailed
+#
+# np vs pp
+LOR_np_pp <- log((nrow(in_SV_np_in_TB)*nrow(in_SV_pp_not_in_TB))/(nrow(in_SV_np_not_in_TB)*nrow(in_SV_pp_in_TB)))
+SEM_np_pp <- sqrt(nrow(in_SV_np_in_TB)^(-1) + nrow(in_SV_pp_not_in_TB)^(-1) + nrow(in_SV_np_not_in_TB)^(-1) + nrow(in_SV_pp_in_TB)^(-1))
+ZSC_np_pp <- LOR_np_pp / SEM_np_pp
+PVL_np_pp <- pnorm(ZSC_np_pp, mean = 0, sd = 1, lower.tail = FALSE) # One-tailed
+#
+# np vs pp
+LOR_nn_pp <- log((nrow(in_SV_nn_in_TB)*nrow(in_SV_pp_not_in_TB))/(nrow(in_SV_nn_not_in_TB)*nrow(in_SV_pp_in_TB)))
+SEM_nn_pp <- sqrt(nrow(in_SV_nn_in_TB)^(-1) + nrow(in_SV_pp_not_in_TB)^(-1) + nrow(in_SV_nn_not_in_TB)^(-1) + nrow(in_SV_pp_in_TB)^(-1))
+ZSC_nn_pp <- LOR_nn_pp / SEM_nn_pp
+PVL_nn_pp <- pnorm(ZSC_nn_pp, mean = 0, sd = 1, lower.tail = FALSE) # One-tailed
+
+out_table <- tibble(numerator = c("miR up; tr down", "miR down; tr up", "miR down tr down"),
+       denominator = c("miR down; tr down", "miR up; tr up", "miR up tr up"),
+       odds_ratio = c(exp(1)^LOR_pn_nn, exp(1)^LOR_np_pp, exp(1)^LOR_nn_pp),
+       z_score = c(ZSC_pn_nn, ZSC_np_pp, ZSC_nn_pp),
+       p_value = c(PVL_pn_nn, PVL_np_pp, PVL_nn_pp))
+
+write_tsv(out_table, file = "plots/target_enrichment_BCa.tab")
+
+
 
 # From paper associated to datasets
 # https://bmccancer.biomedcentral.com/articles/10.1186/s12885-019-5300-6
-# The paper extracts the targets from MTB as well.
-# They validate (up reg and mir10b goes down in cancer)  these: 
-# "We identified that miR-10b levels showed a significant inverse correlation with
-# target mRNA levels in at least one subset of samples (the tumor or the benign) 
-# for 4 out of 15 genes tested: MAPRE1, PIEZO1, SRSF1 and TP53"
-MTB_pairs_l2FC |> filter(miR == "hsa-miR-10b-5p") |> filter(log2FoldChange.y > 0) |> pull(tr)
-MTB_pairs_l2FC |> filter(miR == "hsa-miR-21-5p") |> filter(log2FoldChange.y < 0) |> pull(tr)
+# To assess the physiological and pathological significance of the observed
+# down-regulation of miR-10b, we measured by qRTPCR the mRNA levels of 15 
+# previously validated targets of miR-10b (primer sequences in 
+# Additional file 1: Table S2) based on the validated miRNA target database,
+# miRTarBase [25], in all the RNA samples from our 83-patient cohort. We 
+# identified that miR-10b levels showed a significant inverse correlation with
+# target mRNA levels in at least one subset of samples (the tumor or the benign)
+# for 4 out of 15 genes tested: MAPRE1, PIEZO1, SRSF1 and TP53 (Fig. 3a-c).
+# Note, not successful: BCL2L11, BDNF, CDKN1A, CDKN2A, HOXD10, KLF4, NCOR2,
+# PAX6, PPARa, PTEN, TRA2B
 
-MTB_pairs_l2FC |> filter(log2FoldChange.x >= max(MTB_pairs_l2FC$log2FoldChange.x))
-# hsa-miR-429 COL4A1 DLC1 QKI
-# DLC1 seems to be a tumor-supp gene
-# https://pubmed.ncbi.nlm.nih.gov/?term=DLC1+cancer
-# and check QK1 in Breast cancer
-# https://pubmed.ncbi.nlm.nih.gov/33569406/
+gold <- c(rep(1,4), rep(0, 10))
 
-MTB_pairs_l2FC |> filter(log2FoldChange.x <= min(MTB_pairs_l2FC$log2FoldChange.x))
-# hsa-miR-144-5p, RUNX1
-# https://pubmed.ncbi.nlm.nih.gov/?term=RUNX1+cancer
+test <- resmR |> 
+  as.data.frame() |>
+  rownames_to_column('tr') |>
+  as_tibble() |>
+  filter(tr %in% c("MAPRE1", "PIEZO1", "SRSF1", "TP53",
+                   "BCL2L11", "BDNF",  "CDKN1A", "CDKN2A", 
+                   "HOXD10", "KLF4", "NCOR2",
+                   "PPARA", "PTEN", "TRA2B")) |> # PAX6 removed as expression was not detected
+  select(log2FoldChange) |>
+  mutate(log2FoldChange = ifelse(log2FoldChange > 0, 1, 0)) |>
+  unlist() |>
+  as.vector()
 
-# Panel of co-expression for all four pairs above
-# transform
-bc_microRNA_voom <- voom(bc_microRNA)$E[c('hsa-miR-429','hsa-miR-144-5p'),]
-bc_mRNA_voom <- voom(bc_mRNA)$E[c('COL4A1','DLC1','QKI','RUNX1'),]
-bc_voom <- rbind(bc_microRNA_voom,bc_mRNA_voom)
-# Re-order columns so first all normal and after all tumor samples
-bc_voom <- bc_voom[,c(seq(1,24,2),seq(2,24,2))]
 
-# Plots
-plot_ex_1 <- as_tibble(cbind(sample = colnames(bc_voom), t(bc_voom))) |>
-  mutate_at(2:7, as.numeric) |>
-  rename_with( ~ gsub("-", "_", .x, fixed = TRUE)) |>
-  mutate(tissue = c(rep("normal",12),rep("tumor", 12))) |>
-  ggplot(aes(x = hsa_miR_429, y = COL4A1, color = tissue)) +
-  geom_point() +
-  theme_bw()
-plot_ex_2 <-as_tibble(cbind(sample = colnames(bc_voom), t(bc_voom))) |>
-  mutate_at(2:7, as.numeric) |>
-  rename_with( ~ gsub("-", "_", .x, fixed = TRUE)) |>
-  mutate(tissue = c(rep("normal",12),rep("tumor", 12))) |>
-  ggplot(aes(x = hsa_miR_429, y = DLC1, color = tissue)) +
-  geom_point()  +
-  theme_bw()
-plot_ex_3 <-as_tibble(cbind(sample = colnames(bc_voom), t(bc_voom))) |>
-  mutate_at(2:7, as.numeric) |>
-  rename_with( ~ gsub("-", "_", .x, fixed = TRUE)) |>
-  mutate(tissue = c(rep("normal",12),rep("tumor", 12))) |>
-  ggplot(aes(x = hsa_miR_429, y = QKI, color = tissue)) +
-  geom_point()  +
-  theme_bw()
-plot_ex_4 <-as_tibble(cbind(sample = colnames(bc_voom), t(bc_voom))) |>
-  mutate_at(2:7, as.numeric) |>
-  rename_with( ~ gsub("-", "_", .x, fixed = TRUE)) |>
-  mutate(tissue = c(rep("normal",12),rep("tumor", 12))) |>
-  ggplot(aes(x = hsa_miR_144_5p, y = RUNX1, color = tissue)) +
-  geom_point()  +
-  theme_bw()
+# Check expression of miR-10a-5p
+resmiR |> 
+  as.data.frame() |>
+  rownames_to_column('tr') |>
+  as_tibble() |>
+  filter(tr %in% c("hsa-miR-10b-5p"))
 
-ggsave((plot_ex_1 + plot_ex_2) / (plot_ex_3 + plot_ex_4) + plot_annotation(tag_levels = "A"), file = "plots/figure_examples.png")
+TP = length(which((test + gold) == 2))
+FP = length(which((test[5:14] + gold[5:14]) == 1))
+TN = length(which((test + gold) == 0))
+FN = length(which((test[1:4] + gold[1:4]) == 1))
+
+recall <- TP/(TP+FN)
+FPR <- FP/(FP+TN)
+precision <- TP/(TP+FP)
+accuracy <- (TP+TN)/(TP+TN+FP+FN)
+
+# Preprare output
+output_lines <- list(
+  TP = TP, FP = FP, TN = TN, FN = FN,
+  recall = recall, FPR = FPR,
+  precision = precision, accuracy = accuracy
+)
+formatted_lines <- sapply(names(output_lines), function(name) {
+  paste0(name, " = ", output_lines[[name]])
+})
+# Write output
+writeLines(formatted_lines, "plots/mir10-accuracy_output.txt")
+
+
+
+# Plot
+custom_order <- c("BCL2L11", "BDNF", 
+                  "CDKN1A", "CDKN2A", "HOXD10", "KLF4", "NCOR2", "PAX6",
+                  "PPARA", "PTEN", "TRA2B",
+                  "TP53","MAPRE1", "PIEZO1", "SRSF1")
+
+recall_plot <- resmR |> 
+  as.data.frame() |>
+  rownames_to_column('tr') |>
+  as_tibble() |>
+  filter(tr %in% custom_order) |>
+  mutate(tr = factor(tr, levels = custom_order)) |> 
+  arrange(tr) |>
+  ggplot(aes(x = tr, y = log2FoldChange)) +
+  geom_col() +
+  coord_flip() +  # ← make it horizontal
+  theme_minimal() +
+  labs(x = "Gene", y = "log2 Fold Change", title = "Horizontal Bar Plot")
+ggsave(recall_plot, file = "plots/reacall_plot.png")
 
 # exit
 q()

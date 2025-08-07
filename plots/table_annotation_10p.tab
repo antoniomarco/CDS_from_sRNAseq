@@ -1,0 +1,25 @@
+description	enrichmentRatio	FDR	tissue	database
+Long-term potentiation	3.80841693173477	1.59262603105503e-10	brain	KEGG
+Thyroid hormone signaling pathway	2.93291878650839	9.69074820389437e-10	brain	KEGG
+Circadian entrainment	3.06067850637523	4.10065648104307e-09	brain	KEGG
+Glutamatergic synapse	3.51155747336007	3.49720252756924e-14	cerebellum	KEGG
+Circadian entrainment	3.40406081601232	4.25959267857934e-11	cerebellum	KEGG
+Long-term potentiation	3.90196821895143	7.62856444680438e-11	cerebellum	KEGG
+Focal adhesion	3.24839302112029	1.04916075827077e-13	heart	KEGG
+Proteoglycans in cancer	2.90035091171455	2.84707257769412e-10	heart	KEGG
+Hypertrophic cardiomyopathy (HCM)	3.73621107807855	5.84053805319229e-08	heart	KEGG
+Focal adhesion	2.34800212398779	1.51156472338876e-07	kidney	KEGG
+Lysine degradation	3.58169815523561	3.34978518257145e-07	kidney	KEGG
+Adherens junction	3.2872029735829	3.34978518257145e-07	kidney	KEGG
+neuronal cell body	2.60387946193072	0	brain	Cellular Component (GO)
+presynapse	2.72235729386892	0	brain	Cellular Component (GO)
+cytoplasmic region	2.56349384098544	0	brain	Cellular Component (GO)
+neuronal cell body	2.77477013445449	0	cerebellum	Cellular Component (GO)
+presynapse	3.02313921960308	0	cerebellum	Cellular Component (GO)
+cytoplasmic region	2.37307111334893	0	cerebellum	Cellular Component (GO)
+actin cytoskeleton	2.93346774193548	0	heart	Cellular Component (GO)
+cell-substrate junction	3.46510141612567	0	heart	Cellular Component (GO)
+cell-substrate adherens junction	3.46675686998268	0	heart	Cellular Component (GO)
+cell-substrate junction	3.03257514538927	0	kidney	Cellular Component (GO)
+cell-substrate adherens junction	3.03685949602465	0	kidney	Cellular Component (GO)
+focal adhesion	3.05941043287632	0	kidney	Cellular Component (GO)

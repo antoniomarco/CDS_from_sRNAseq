@@ -1,0 +1,8 @@
+TP = 3
+FP = 4
+TN = 6
+FN = 1
+recall = 0.75
+FPR = 0.4
+precision = 0.428571428571429
+accuracy = 0.642857142857143
