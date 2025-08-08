@@ -104,15 +104,24 @@ volcano_mRNA <- EnhancedVolcano(resmR,
                                 pCutoff = 0.01,
                                 xlim = c(-5,5),
                                 labSize = 3)
+ggsave(volcano_mRNA, file = "plots/volcano_mRNA.png")
+
 vsdmR <-varianceStabilizingTransformation(ddsmR, blind=FALSE)
 hit_genes_mRNA <- rownames(hits_over_mRNA)
 vsdmR_hits <- vsdmR[hit_genes_mRNA,]
 heatmap_mRNA <- pheatmap(as.matrix(assay(vsdmR_hits)),
                          fontsize_row = 6,
-                         labels_col = rep(c("N", "T"), 12))
+                         labels_col = rep(c("N", "T"), 12),
+                         show_rownames = FALSE) # no names
+ggsave(heatmap_mRNA, file = "plots/heatmap_mRNA_nonames.png")
 
-ggsave(volcano_mRNA, file = "plots/volcano_mRNA.png")
-ggsave(heatmap_mRNA, file = "plots/heatmap_mRNA.png")
+heatmap_mRNA <- pheatmap(as.matrix(assay(vsdmR_hits)),
+                         fontsize_row = 6,
+                         labels_col = rep(c("N", "T"), 12))
+ggsave(heatmap_mRNA, file = "plots/heatmap_mRNA.png", units = "cm", width = 12, height = 96)
+
+
+
 
 
 ## Functional annotation of DEG mRNA. For information only
