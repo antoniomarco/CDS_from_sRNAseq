@@ -100,7 +100,7 @@ plot_MTB <- ggplot(data = data.corrs.s02.w02, aes(x = mid, y = corr, col = 'dark
   geom_hline(yintercept=0, linetype="solid", color = "black") +
   geom_vline(xintercept=0, linetype="dashed", color = "black") +
   xlab("Correlation (Pearson's coefficient)") +
-  ylab("log2(target/non-target)") +
+  ylab(expression(log[2]*"(target/non-target)")) +
   theme_bw() +
   theme(legend.position="none")
 

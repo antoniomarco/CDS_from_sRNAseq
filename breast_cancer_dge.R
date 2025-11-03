@@ -97,13 +97,16 @@ ddsmR <-DESeq(ddsMatmR)
 resmR <- results(ddsmR, contrast=c("tissue","tumor","normal"))
 hits_over_mRNA<-resmR[which((resmR$padj<=0.01) & (abs(resmR$log2FoldChange) >= 1)),]
 # plots
+gene_names <- as.character(rownames(resmR))
+gene_labels <- paste0('italic(', (gene_names), ')')
 volcano_mRNA <- EnhancedVolcano(resmR,
-                                lab = row.names(resmR),
+                                lab = gene_labels,
                                 x = "log2FoldChange",
                                 y = "padj",
                                 pCutoff = 0.01,
                                 xlim = c(-5,5),
-                                labSize = 3)
+                                labSize = 3,
+                                parseLabels = TRUE)
 ggsave(volcano_mRNA, file = "plots/volcano_mRNA.png")
 
 vsdmR <-varianceStabilizingTransformation(ddsmR, blind=FALSE)
@@ -402,9 +405,17 @@ recall_plot <- resmR |>
   arrange(tr) |>
   ggplot(aes(x = tr, y = log2FoldChange)) +
   geom_col() +
-  coord_flip() +  # ← make it horizontal
+  coord_flip() +  # make it horizontal
   theme_minimal() +
-  labs(x = "Gene", y = "log2 Fold Change", title = "Horizontal Bar Plot")
+  labs(
+    x = NULL,  # we will use axis.text.y for gene names
+    y = expression(log[2]~"Fold Change"),
+    title = "Horizontal Bar Plot"
+  ) +
+  scale_y_continuous() +
+  theme(
+    axis.text.y = element_text(face = "italic")  # italics for gene names
+  )
 ggsave(recall_plot, file = "plots/reacall_plot.png")
 
 # exit
