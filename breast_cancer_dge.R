@@ -418,5 +418,52 @@ recall_plot <- resmR |>
   )
 ggsave(recall_plot, file = "plots/reacall_plot.png")
 
+
+all_values <- data.frame(threshold = numeric(), recall = numeric(), FPR = numeric(), precision = numeric(), accuracy = numeric())
+for(threshold in seq(0,2,0.1)){
+  test <- resmR |> 
+    as.data.frame() |>
+    rownames_to_column('tr') |>
+    as_tibble() |>
+    filter(tr %in% c("MAPRE1", "PIEZO1", "SRSF1", "TP53",
+                     "BCL2L11", "BDNF",  "CDKN1A", "CDKN2A", 
+                     "HOXD10", "KLF4", "NCOR2",
+                     "PPARA", "PTEN", "TRA2B")) |> # PAX6 removed as expression was not detected
+    select(log2FoldChange) |>
+    mutate(log2FoldChange = ifelse(log2FoldChange > threshold, 1, 0)) |>
+    unlist() |>
+    as.vector()
+    resmiR |> 
+    as.data.frame() |>
+    rownames_to_column('tr') |>
+    as_tibble() |>
+    filter(tr %in% c("hsa-miR-10b-5p"))
+  TP = length(which((test + gold) == 2))
+  FP = length(which((test[5:14] + gold[5:14]) == 1))
+  TN = length(which((test + gold) == 0))
+  FN = length(which((test[1:4] + gold[1:4]) == 1))
+  recall <- TP/(TP+FN)
+  FPR <- FP/(FP+TN)
+  precision <- TP/(TP+FP)
+  accuracy <- (TP+TN)/(TP+TN+FP+FN)
+  outvector <- c(threshold, recall, FPR, precision, accuracy)
+  all_values <- rbind(all_values, outvector)
+}
+colnames(all_values) <- c("threshold", "recall", "FPR", "precision", "accuracy")
+
+# Plot
+recall_plot_2 <- all_values |>
+  pivot_longer(cols = c("recall", "FPR", "precision", "accuracy"),
+               names_to = "statistic") |>
+  filter(statistic != "FPR") |>
+  ggplot(aes(x = threshold,
+             y = value,
+             color = statistic)) +
+  geom_line() +
+  labs(y = "Value",
+       x = expression(log[2]*"(fold-change) threshold")) +
+  theme_minimal()
+ggsave(recall_plot_2, file = "plots/reacall_plot_2.png")
+
 # exit
 q()
